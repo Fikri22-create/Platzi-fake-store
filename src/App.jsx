@@ -3,11 +3,13 @@ import BannerComponent from "./components/BannerComponent";
 import CardListComponent from "./components/CardListComponent";
 import { Button } from "flowbite-react";
 import { Link } from "react-router-dom";
+import { Spinner } from "flowbite-react";
 
 export default function App() {
   const [categoryProducts, setCategoryProducts] = useState([])
 
   const [Products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   async function getDataCategory() {
     const url = " https://api.escuelajs.co/api/v1/categories";
@@ -19,6 +21,7 @@ export default function App() {
 
       const result = await response.json();
       setCategoryProducts(result.slice(0,4));
+      setLoading(false);
     } catch (error) {
       console.error(error.message);
     }
@@ -34,6 +37,7 @@ export default function App() {
 
       const result = await response.json();
       setProducts(result.slice(0,4));
+      setLoading(false);
     } catch (error) {
       console.error(error.message);
     }
@@ -43,6 +47,15 @@ export default function App() {
     getDataCategory();
     getDataProduct();
   }, []);
+
+  if(loading) {
+    return (
+      <div className="flex justify-center">
+        <Spinner aria-label="Default status example"/>
+        Sedang mengambil data
+      </div>
+    )
+  }
 
   return (
     <div className="px-15">
