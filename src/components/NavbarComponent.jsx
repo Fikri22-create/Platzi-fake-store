@@ -31,7 +31,7 @@ export default function NavbarComponent() {
             <span className="block truncate text-sm font-medium">fikriamuhammad93@gmail.com</span>
           </DropdownHeader>
           <DropdownItem><Link to="/profile">Profile</Link></DropdownItem>
-          <DropdownItem>Dashboard</DropdownItem>
+          <DropdownItem><Link to="/">Dashboard</Link></DropdownItem>
           <DropdownItem>Settings</DropdownItem>
           <DropdownItem>Earnings</DropdownItem>
           <DropdownDivider />

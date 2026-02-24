@@ -25,7 +25,7 @@ export const router = createBrowserRouter([
                 element: <Profile />
             },
             {
-                path: "/categories/:categoriId",
+                path: "/categories/:categoryId",
                 element: <Productcategory/>
                 //path dinamis ditandai dengan titik 2 (:)
             }
