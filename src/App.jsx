@@ -52,9 +52,9 @@ export default function App() {
     return (
       <div className="flex justify-center">
         <Spinner aria-label="Default status example"/>
-        Sedang mengambil data
+        Loading...
       </div>
-    )
+    ) 
   }
 
   return (
