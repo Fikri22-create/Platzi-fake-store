@@ -1,59 +1,91 @@
 import { useEffect, useState } from "react";
 import { Spinner, Card } from "flowbite-react";
 import { Button } from "flowbite-react";
+import CardListComponent from "../components/CardListComponent";
+import SearchComp from "../components/SearchComp";
+import DropDownFilter from "../components/DropDownFilter";
+import PaginationComp from "../components/PaginationComp";
 
 
 export default function Products() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [searchTitle, setSearchTitle] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const onPageChange = (page) => {
+        setCurrentPage(page);
+        setLoading(true);
+        getProducts();
+    };
 
-    useEffect(() => {
-        async function getProducts() {
-            try {
-                const response = await fetch(
-                    "https://api.escuelajs.co/api/v1/products"
-                );
-
-                if (!response.ok) {
-                    throw new Error("Gagal mengambil data products");
-                }
-
-                const result = await response.json();
-                setProducts(result);
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoading(false);
-            }
+    function processSearch(event) {
+        setSearchTitle(event.target.value);
+        setLoading(true);
+        let url = "";   
+        if (searchTitle != "") {
+            url ="https://api.escuelajs.co/api/v1/products/?title=" + searchTitle;
+        } else {
+            url = "https://api.escuelajs.co/api/v1/products/?title=" + "&limit=8" + "&offset=" + currentPage
         }
+        getProducts(url);
+    }
 
+    function processSort(type) {
+        let sortedProducts = [...products];
+
+        if (type == 'harga-murah') {
+            sortedProducts.sort((a, b) => a.price - b.price);
+        } else if (type == 'harga-mahal') {
+            sortedProducts.sort((a, b) => b.price - a.price);
+        } else if (type == 'alfabet-turun') {
+            sortedProducts.sort((a, b) => a.title.localeCompare(b.title));
+        } else if (type == 'alfabet-naik') { 
+            sortedProducts.sort((a, b) => b.title.localeCompare(a.title));
+        }
+        setProducts(sortedProducts);    
+    }
+
+    async function getProducts(url = "https://api.escuelajs.co/api/v1/products/?limit=8" + "&offset=" + currentPage ) {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`response status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            setProducts(result);
+            setLoading(false);
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
+    useEffect(() => {
         getProducts();
     }, []);
 
-    if(loading) {
-        return (
-        <div className="flex justify-center">
-            <Spinner aria-label="Default status example"/>
-            Loading...
-        </div>
-        ) 
-    }
 
     return (
-        <div className="px-10 py-10">
-            <h3 className="text-5xl font-bold mb-8 text-center">Daftar Lengkap Produk</h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {products.map((item) => (
-                    <Card key={item.id} imgAlt={item.title} imgSrc={item.images[0]} className="hover:scale-105 transition duration-300">
-                         <h5 className="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">{item.title}</h5>
-                        <p className="text-cyan-600 font-bold">${item.price}</p>
-                        <div className="flex flex-wrap gap-2">
-                            <Button>details</Button>
-                        </div>
-                    </Card>
-                ))}
+        <div className="block mx-auto w-4xl">
+            <h5 className="text-5xl font-bold mb-8 text-center">Daftar Lengkap Produk</h5>
+            <div className="flex gap-2 mb-6">
+                <SearchComp onKeyUpAction={processSearch} />
+                <DropDownFilter onClickAction={processSort} />
             </div>
+            {
+            loading ?(
+                <div className="min-h-screen flex items-center justify-center">
+                    <Spinner aria-label="deffault status example" />
+                    Loading...
+                </div>
+                ) : (
+                    <CardListComponent data={products} type="product" />
+                )}
+                {
+                    searchTitle == "" ?
+                        (<div className="my-5">
+                            <PaginationComp currentPage={currentPage} onPageChange={onPageChange}/>
+                        </div> ) : ""
+                }
         </div>
     );
 }

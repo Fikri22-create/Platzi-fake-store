@@ -50,7 +50,7 @@ export default function App() {
 
   if(loading) {
     return (
-      <div className="flex justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <Spinner aria-label="Default status example"/>
         Loading...
       </div>
